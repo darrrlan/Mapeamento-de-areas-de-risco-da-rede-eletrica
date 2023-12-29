@@ -49,7 +49,7 @@ else:
     images = np.array(images) / 255.0
 
 # Splitting the data into training and testing sets
-train_images, test_images, train_labels, test_labels, train_image_paths, test_image_paths = train_test_split(images, labels, image_paths, test_size=0.2, random_state=42)
+train_images, test_images, train_labels, test_labels, train_image_paths, test_image_paths = train_test_split(images, labels, image_paths, test_size=0.2, random_state=0)
 
 # Choose between RGB and grayscale
 if use_rgb:
@@ -95,7 +95,7 @@ predictions_probs = model.predict(test_images)
 predictions = (predictions_probs > 0.5).astype(int)
 
 # Specify the directory where files will be saved
-save_directory = './analysis/'
+save_directory = './results/'
 
 # Save the entire model (architecture + weights + optimizer state)
 model_file = os.path.join(save_directory, 'CNN_model.keras') if use_rgb else os.path.join(save_directory, 'CNN_model_gray.keras')
@@ -106,5 +106,7 @@ np.save(os.path.join(save_directory, 'predictions.npy'), predictions)
 np.save(os.path.join(save_directory, 'test_labels.npy'), test_labels)
 np.save(os.path.join(save_directory, 'test_image_paths.npy'), np.array(test_image_paths))  # Salvar os caminhos das imagens
 
+# Save the entire model (architecture + weights + optimizer state)
+model.save(model_file)
 # Save only the weights
 model.save_weights(weights_file)

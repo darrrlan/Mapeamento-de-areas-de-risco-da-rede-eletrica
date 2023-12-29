@@ -144,7 +144,7 @@ def display_images_predictions_0_and_1(test_images_path, test_labels, prediction
     max_images_per_row = max(size_1_to_0, size_0_to_1, num_images)
 
     # Display up to 'num_images' images for each condition
-    num_rows = 2
+    num_rows = 1
     num_cols = min(max_images_per_row, 4)  # Maximum of 4 columns to improve layout
 
     plt.figure(figsize=(15, 8))
@@ -163,7 +163,7 @@ def display_images_predictions_0_and_1(test_images_path, test_labels, prediction
             predicted_label_1_to_0 = "High Risk" if predictions[idx_1_to_0] == 0 else "Low Risk"
 
             # Subplot for 1 to 0
-            plt.subplot(num_rows, num_cols, i + 1)
+            plt.subplot(num_rows, num_cols, i * 2 + 1)
             plt.imshow(img_1_to_0)
             plt.title(f"True: {true_label_1_to_0}\nPredicted: {predicted_label_1_to_0}")
             plt.axis('off')
@@ -182,7 +182,7 @@ def display_images_predictions_0_and_1(test_images_path, test_labels, prediction
             predicted_label_0_to_1 = "High Risk" if predictions[idx_0_to_1] == 1 else "Low Risk"
 
             # Subplot for 0 to 1
-            plt.subplot(num_rows, num_cols, i + num_images + 1)
+            plt.subplot(num_rows, num_cols, i * 2 + 2)
             plt.imshow(img_0_to_1)
             plt.title(f"True: {true_label_0_to_1}\nPredicted: {predicted_label_0_to_1}")
             plt.axis('off')
@@ -190,6 +190,7 @@ def display_images_predictions_0_and_1(test_images_path, test_labels, prediction
     # General adjustments for layout
     plt.subplots_adjust(wspace=0.4, hspace=0.4)  # Adjust horizontal and vertical spacings
     plt.show()
+
 
 def main():
     directory = r'.\results\cnnLogs'
@@ -228,8 +229,8 @@ def main():
         plt.show()
 
     # Load the model and weights
-    model_path = 'analysis/CNN_model.keras'
-    weights_path = 'analysis/CNN_weights.keras'
+    model_path = 'results/CNN_model.keras'
+    weights_path = 'results/CNN_weights.keras'
     model = load_model(model_path)
     model.load_weights(weights_path)
 
@@ -241,9 +242,9 @@ def main():
     visualize_activation_maps(model, image)
 
     # Specify the paths for predictions and test labels
-    predictions_path = 'analysis/predictions.npy'
-    test_labels_path = 'analysis/test_labels.npy'
-    test_images_path = 'analysis/test_image_paths.npy'
+    predictions_path = 'results/predictions.npy'
+    test_labels_path = 'results/test_labels.npy'
+    test_images_path = 'results/test_image_paths.npy'
 
     # Generate and plot the confusion matrix
     generate_confusion_matrix(predictions_path, test_labels_path)
