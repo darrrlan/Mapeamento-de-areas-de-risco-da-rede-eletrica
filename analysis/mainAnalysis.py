@@ -75,7 +75,6 @@ def visualize_activation_maps(model, image):
     plt.tight_layout()
     plt.show()
 
-
 def load_and_process_image(image_path):
     # Load the image
     image = cv2.imread(image_path)
@@ -131,7 +130,6 @@ def generate_roc_curve(predictions_probs_path, test_labels_path):
     plt.title('ROC Curve')
     plt.legend()
     plt.show()
-
 
 def display_images_predictions_0_and_1(test_images_path, test_labels, predictions, num_images=2):
     # Load the test images (assuming they are file paths)
@@ -193,17 +191,6 @@ def display_images_predictions_0_and_1(test_images_path, test_labels, prediction
     plt.subplots_adjust(wspace=0.4, hspace=0.4)  # Adjust horizontal and vertical spacings
     plt.show()
 
-
-
-
-
-
-# Exibir imagens para as previsões onde o valor verdadeiro é 1 e o valor previsto é 0, e vice-versa
-
-
-
-
-
 def main():
     directory = r'.\results\cnnLogs'
 
@@ -230,8 +217,6 @@ def main():
         print('{}:'.format(key))
         print('  Mean={:.4f}, Standard Deviation={:.4f}'.format(np.mean(mean_value), np.mean(std_deviation)))
 
-        '''
-
         # Create point plot with error bars using matplotlib
         plt.figure()
         plt.errorbar(statistics['Epoch'], mean_value, yerr=std_deviation, fmt='o', capsize=5, label='Data Points')
@@ -241,8 +226,6 @@ def main():
         plt.title(f'{key} - Mean and Standard Deviation')
         plt.legend()
         plt.show()
-        '''
-
 
     # Load the model and weights
     model_path = 'analysis/CNN_model.keras'
@@ -254,25 +237,22 @@ def main():
     image_path = 'dataset_vegetation_on_electrical_grid/Alto risco/2.png'
     image = load_and_process_image(image_path)
 
-    '''
     # Visualize activation maps
     visualize_activation_maps(model, image)
-    '''
 
     # Specify the paths for predictions and test labels
     predictions_path = 'analysis/predictions.npy'
     test_labels_path = 'analysis/test_labels.npy'
     test_images_path = 'analysis/test_image_paths.npy'
 
-    '''
     # Generate and plot the confusion matrix
     generate_confusion_matrix(predictions_path, test_labels_path)
      # Generate and plot the ROC curve
     generate_roc_curve(predictions_path, test_labels_path)
 
-    '''
     test_predictions = np.load(predictions_path)
     test_labels = np.load(test_labels_path)
+    # Exibir imagens para as previsões onde o valor verdadeiro é 1 e o valor previsto é 0, e vice-versa
     display_images_predictions_0_and_1(test_images_path, test_labels, test_predictions, num_images=2)
 
 if __name__ == "__main__":
