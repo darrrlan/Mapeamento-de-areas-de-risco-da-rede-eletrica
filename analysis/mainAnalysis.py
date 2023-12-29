@@ -133,53 +133,70 @@ def generate_roc_curve(predictions_probs_path, test_labels_path):
     plt.show()
 
 
-def exibir_imagens_predicoes_0_e_1(test_images, test_labels, predictions, num_imagens=2):
+def exibir_imagens_predicoes_0_e_1(test_images_path, test_labels, predictions, num_imagens=2):
+    # Load the test images (assuming they are file paths)
+    test_images = [load_and_process_image(image_path) for image_path in np.load(test_images_path)]
 
-    indices_1_para_0 = np.where((test_labels == 1) & (predictions == 0))[0]
-    indices_0_para_1 = np.where((test_labels == 0) & (predictions == 1))[0]
+    indices_1_para_0 = np.where((test_labels == 1) & (predictions.flatten() == 0))[0]
+    indices_0_para_1 = np.where((test_labels == 0) & (predictions.flatten() == 1))[0]
 
+    # Determine o número máximo de imagens em uma linha
+    tam_0_para_1 = min(2, len(indices_0_para_1))
+    tam_1_para_0 = min(2, len(indices_1_para_0))
+    max_images_per_row = max(tam_1_para_0, tam_0_para_1, num_imagens)
 
-    print(indices_1_para_0)
-    print(indices_0_para_1)
     # Exibir até 'num_imagens' imagens para cada condição
     num_rows = 2
-    num_cols = num_imagens
+    num_cols = min(max_images_per_row, 4)  # Máximo de 4 colunas para melhorar o layout
+
     plt.figure(figsize=(15, 8))
 
-    for i in range(min(num_imagens, len(indices_1_para_0))):
-        idx_1_para_0 = indices_1_para_0[i]
-        img_1_para_0 = test_images[idx_1_para_0]
-        # Converte para RGB se não estiver em RGB
-        if len(img_1_para_0.shape) == 2:
-            img_1_para_0 = plt.cm.gray(img_1_para_0)
-        verdadeiro_rotulo_1_para_0 = "Alto Risco" if test_labels[idx_1_para_0] == 1 else "Baixo Risco"
-        predito_rotulo_1_para_0 = "Alto Risco" if predictions[idx_1_para_0] == 1 else "Baixo Risco"
+    # Exibir imagens para a condição de 1 para 0
+    for i, idx_1_para_0 in enumerate(indices_1_para_0[:num_imagens]):
+        # Check if the index is within bounds
+        if idx_1_para_0 < len(test_images):
+            img_1_para_0 = test_images[idx_1_para_0]
 
-        # Subplot para 1 para 0
-        plt.subplot(num_rows, num_cols, i + 1)
-        plt.imshow(img_1_para_0)
-        plt.title(f"Verdadeiro: {verdadeiro_rotulo_1_para_0}\nPrevisto: {predito_rotulo_1_para_0}")
-        plt.axis('off')
+            # Converte para RGB se não estiver em RGB
+            if len(img_1_para_0.shape) == 2:
+                img_1_para_0 = plt.cm.gray(img_1_para_0)
 
-    for i in range(min(num_imagens, len(indices_0_para_1))):
-        idx_0_para_1 = indices_0_para_1[i]
-        img_0_para_1 = test_images[idx_0_para_1]
-        # Converte para RGB se não estiver em RGB
-        print("oi")
-        if len(img_0_para_1.shape) == 2:
-            img_0_para_1 = plt.cm.gray(img_0_para_1)
-        verdadeiro_rotulo_0_para_1 = "Alto Risco" if test_labels[idx_0_para_1] == 1 else "Baixo Risco"
-        predito_rotulo_0_para_1 = "Alto Risco" if predictions[idx_0_para_1] == 1 else "Baixo Risco"
+            verdadeiro_rotulo_1_para_0 = "Alto Risco" if test_labels[idx_1_para_0] == 1 else "Baixo Risco"
+            predito_rotulo_1_para_0 = "Alto Risco" if predictions[idx_1_para_0] == 0 else "Baixo Risco"
 
-        # Subplot para 0 para 1
-        plt.subplot(num_rows, num_cols, i + num_imagens + 1)
-        plt.imshow(img_0_para_1)
-        plt.title(f"Verdadeiro: {verdadeiro_rotulo_0_para_1}\nPrevisto: {predito_rotulo_0_para_1}")
-        plt.axis('off')
+            # Subplot para 1 para 0
+            plt.subplot(num_rows, num_cols, i + 1)
+            plt.imshow(img_1_para_0)
+            plt.title(f"Verdadeiro: {verdadeiro_rotulo_1_para_0}\nPrevisto: {predito_rotulo_1_para_0}")
+            plt.axis('off')
+
+    # Exibir imagens para a condição de 0 para 1
+    for i, idx_0_para_1 in enumerate(indices_0_para_1[:num_imagens]):
+        # Check if the index is within bounds
+        if idx_0_para_1 < len(test_images):
+            img_0_para_1 = test_images[idx_0_para_1]
+
+            # Converte para RGB se não estiver em RGB
+            if len(img_0_para_1.shape) == 2:
+                img_0_para_1 = plt.cm.gray(img_0_para_1)
+
+            verdadeiro_rotulo_0_para_1 = "Alto Risco" if test_labels[idx_0_para_1] == 1 else "Baixo Risco"
+            predito_rotulo_0_para_1 = "Alto Risco" if predictions[idx_0_para_1] == 1 else "Baixo Risco"
+
+            # Subplot para 0 para 1
+            plt.subplot(num_rows, num_cols, i + num_imagens + 1)
+            plt.imshow(img_0_para_1)
+            plt.title(f"Verdadeiro: {verdadeiro_rotulo_0_para_1}\nPrevisto: {predito_rotulo_0_para_1}")
+            plt.axis('off')
 
     # Ajustes gerais para layout
-    plt.tight_layout()
+    plt.subplots_adjust(wspace=0.4, hspace=0.4)  # Ajusta os espaçamentos horizontal e vertical
     plt.show()
+
+
+
+
+
 
 # Exibir imagens para as previsões onde o valor verdadeiro é 1 e o valor previsto é 0, e vice-versa
 
@@ -247,15 +264,16 @@ def main():
     test_labels_path = 'analysis/test_labels.npy'
     test_images_path = 'analysis/test_image_paths.npy'
 
+    '''
     # Generate and plot the confusion matrix
     generate_confusion_matrix(predictions_path, test_labels_path)
-    '''
      # Generate and plot the ROC curve
     generate_roc_curve(predictions_path, test_labels_path)
 
     '''
     test_predictions = np.load(predictions_path)
-    exibir_imagens_predicoes_0_e_1(test_images_path, test_labels_path, test_predictions, num_imagens=2)
+    test_labels = np.load(test_labels_path)
+    exibir_imagens_predicoes_0_e_1(test_images_path, test_labels, test_predictions, num_imagens=2)
 
 if __name__ == "__main__":
     main()
