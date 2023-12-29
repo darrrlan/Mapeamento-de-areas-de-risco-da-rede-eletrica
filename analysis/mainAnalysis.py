@@ -1,5 +1,5 @@
-import csv
 import os
+import csv
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -56,10 +56,12 @@ def main():
 
         # Create point plot with error bars using matplotlib
         plt.figure()
-        plt.errorbar(statistics['Epoch'], mean_value, yerr=std_deviation, fmt='o', capsize=5)
+        plt.errorbar(statistics['Epoch'], mean_value, yerr=std_deviation, fmt='o', capsize=5, label='Data Points')
+        plt.plot(statistics['Epoch'], mean_value, label='Mean Line', color='red')  # Add the line
         plt.xlabel('Epoch')
         plt.ylabel(key)
         plt.title(f'{key} - Mean and Standard Deviation')
+        plt.legend()
         plt.show()
 
 if __name__ == "__main__":
