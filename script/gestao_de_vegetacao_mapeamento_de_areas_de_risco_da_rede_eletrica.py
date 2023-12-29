@@ -1,15 +1,15 @@
-# Libraries
 import os
 import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
-import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
 def load_images_from_folders(root_folder):
     images = []
     labels = []
+    image_paths = []  # Adicionado para armazenar os caminhos das imagens
+
     label_mapping = {'Baixo risco': 0, 'Alto risco': 1}
 
     for label_folder in os.listdir(root_folder):
@@ -19,12 +19,14 @@ def load_images_from_folders(root_folder):
         if os.path.isdir(label_path):
             label = label_mapping.get(label_folder, -1)
             for filename in os.listdir(label_path):
-                img = cv2.imread(os.path.join(label_path, filename))
+                img_path = os.path.join(label_path, filename)
+                img = cv2.imread(img_path)
                 if img is not None:
                     images.append(img)
                     labels.append(label)
+                    image_paths.append(img_path)
 
-    return images, labels
+    return images, labels, image_paths  # Retornar também os caminhos das imagens
 
 # Choose between RGB (True) and grayscale (False)
 use_rgb = True
@@ -33,7 +35,7 @@ use_rgb = True
 data_path = r'.\dataset_vegetation_on_electrical_grid'
 
 # Load images and labels
-images, labels = load_images_from_folders(data_path)
+images, labels, image_paths = load_images_from_folders(data_path)
 
 # Ensure all images have the same dimensions
 if use_rgb:
@@ -47,7 +49,7 @@ else:
     images = np.array(images) / 255.0
 
 # Splitting the data into training and testing sets
-train_images, test_images, train_labels, test_labels = train_test_split(images, labels, test_size=0.2, random_state=856)
+train_images, test_images, train_labels, test_labels, train_image_paths, test_image_paths = train_test_split(images, labels, image_paths, test_size=0.2, random_state=42)
 
 # Choose between RGB and grayscale
 if use_rgb:
@@ -92,15 +94,17 @@ predictions_probs = model.predict(test_images)
 # Convert probabilities to predicted labels (0 or 1)
 predictions = (predictions_probs > 0.5).astype(int)
 
-# Choose the directory where files will be saved
+# Specify the directory where files will be saved
 save_directory = './analysis/'
 
-# Define file names based on whether RGB is used or not
-model_file = os.path.join(save_directory, 'model_cnn_rgb.keras') if use_rgb else os.path.join(save_directory, 'model_cnn_gray.keras')
-weights_file = os.path.join(save_directory, 'weights_cnn_rgb.keras') if use_rgb else os.path.join(save_directory, 'weights_cnn_gray.keras')
-
 # Save the entire model (architecture + weights + optimizer state)
-model.save(model_file)
+model_file = os.path.join(save_directory, 'CNN_model.keras') if use_rgb else os.path.join(save_directory, 'CNN_model_gray.keras')
+weights_file = os.path.join(save_directory, 'CNN_weights.keras') if use_rgb else os.path.join(save_directory, 'CNN_weights_gray.keras')
+
+# Save the predictions, test labels, test image paths
+np.save(os.path.join(save_directory, 'predictions.npy'), predictions)
+np.save(os.path.join(save_directory, 'test_labels.npy'), test_labels)
+np.save(os.path.join(save_directory, 'test_image_paths.npy'), np.array(test_image_paths))  # Salvar os caminhos das imagens
 
 # Save only the weights
 model.save_weights(weights_file)
